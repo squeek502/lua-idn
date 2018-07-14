@@ -1,4 +1,4 @@
-local idn = require'idn'
+local idn = require('idn3490')
 
 local prepare = function(str)
 	return (str:gsub('[\n%s]+', ''):gsub('[uU]%+([A-F0-9]+)%s?', function(n)

@@ -300,6 +300,10 @@ end
 return {
 	encode = idn_encode,
 	decode = idn_decode,
+	-- aliases
+	toASCII = idn_encode,
+	toUnicode = idn_decode,
+	toUTF8 = idn_decode,
 
 	punycode = {
 		encode = punycode_encode,

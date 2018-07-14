@@ -17,6 +17,21 @@ local pe = idn.punycode.encode
 local pd = idn.punycode.decode
 local ie = idn.encode
 
+local indent = 0
+local context = function(title, fn)
+	print(string.rep(" ", indent) .. title)
+	indent = indent + 2
+	fn()
+	indent = indent - 2
+end
+local test = context
+local assert_equal = function(actual, expected)
+	assert(actual == expected, "Got " .. tostring(actual) .. ", expected " .. tostring(expected))
+end
+local assert_nil = function(ok)
+	assert(not ok)
+end
+
 context("RFC 3492 - Sample Strings", function()
 	context("Encoding", function()
 		test("Arabic (Egyptian)", function()

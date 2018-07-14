@@ -16,6 +16,7 @@ end
 local pe = idn.punycode.encode
 local pd = idn.punycode.decode
 local ie = idn.encode
+local id = idn.decode
 
 local indent = 0
 local context = function(title, fn)
@@ -319,37 +320,29 @@ context("RFC 3492 - Sample Strings", function()
 		end)
 	end)
 
-	context("Hyphens", function()
-		test("first letter first label", function()
-			assert_nil(ie'-example')
+	context("Input == Output when nothing needs to be encoded/decoded", function()
+		test("encode", function()
+			assert_equal(ie'www.example.com', 'www.example.com')
 		end)
 
-		test("first letter second label", function()
-			assert_nil(ie'www.-example')
+		test("encode blank label", function()
+			assert_equal(ie'.example', '.example')
 		end)
 
-		test("last letter first label", function()
-			assert_nil(ie'example-')
+		test("already encoded", function()
+			assert_equal(ie'www.xn--85x722f.xn--55qx5d.cn', 'www.xn--85x722f.xn--55qx5d.cn')
 		end)
 
-		test("last letter second label", function()
-			assert_nil(ie'www.example-')
+		test("decode", function()
+			assert_equal(id'www.example.com', 'www.example.com')
 		end)
 
-		test("second letter first label", function()
-			assert_equal(ie'e-xample', 'e-xample')
+		test("decode blank label", function()
+			assert_equal(id'.example', '.example')
 		end)
 
-		test("second letter second label", function()
-			assert_equal(ie'www.e-xample', 'www.e-xample')
-		end)
-
-		test("second last letter first label", function()
-			assert_equal(ie'exampl-e', 'exampl-e')
-		end)
-
-		test("second last letter second label", function()
-			assert_equal(ie'www.exampl-e', 'www.exampl-e')
+		test("already decoded", function()
+			assert_equal(id'www.食狮.公司.cn', 'www.食狮.公司.cn')
 		end)
 	end)
 end)

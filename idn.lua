@@ -257,21 +257,28 @@ do
 	end
 end
 
+-- split at every separator rather than get tokens between separators
+-- e.g. splitString("/a/b//c/", "/") will return {"", "a", "b", "", "c", ""}
+local function splitString(str, sep)
+	local parts = {}
+	local pos = 0
+	local splitIterator = function() return str:find(sep, pos, true) end
+	for sepStart, sepEnd in splitIterator do
+		table.insert(parts, str:sub(pos, sepStart - 1))
+		pos = sepEnd + 1
+	end
+	table.insert(parts, str:sub(pos))
+	return parts
+end
+
 local idn_encode
 do
 	function idn_encode(domain)
 		local labels = {}
-		for label in domain:gmatch('([^.]+)%.?') do
-			-- Domain names can only consist of a-z, A-Z, 0-9, - and aren't allowed
-			-- to start or end with a hyphen
-			local first, last = label:sub(1, 1), label:sub(-1)
-			if(first == '-' or last == '-') then
-				return nil, 'Invalid DNS label'
-			end
-
-			if(label:match('^[a-zA-Z0-9-]+$')) then
+		for _,label in ipairs(splitString(domain, '.')) do
+			if label:match('^[\1-\127]*$') then
 				table.insert(labels, label)
-			elseif(label:sub(1,1) ~= '-' and label:sub(2,2) ~= '-') then
+			else
 				local plabel = punycode_encode(label)
 				table.insert(labels, string.format('xn--%s', plabel))
 			end
@@ -285,10 +292,10 @@ local idn_decode
 do
 	function idn_decode(domain)
 		local labels = {}
-		for label in domain:gmatch('([^.]+)%.?') do
+		for _,label in ipairs(splitString(domain, '.')) do
 			if(label:sub(1, 4) == 'xn--') then
 				table.insert(labels, punycode_decode(label:sub(5)))
-			elseif(label:match('^[a-zA-Z0-9-]+$')) then
+			else
 				table.insert(labels, label)
 			end
 		end

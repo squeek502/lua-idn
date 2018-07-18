@@ -294,7 +294,11 @@ do
 		local labels = {}
 		for _,label in ipairs(splitString(domain, '.')) do
 			if(label:sub(1, 4) == 'xn--') then
-				table.insert(labels, punycode_decode(label:sub(5)))
+				local decoded, err = punycode_decode(label:sub(5))
+				if err then
+					return nil, err
+				end
+				table.insert(labels, decoded)
 			else
 				table.insert(labels, label)
 			end

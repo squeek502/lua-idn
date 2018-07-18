@@ -345,4 +345,17 @@ context("RFC 3492 - Sample Strings", function()
 			assert_equal(id'www.食狮.公司.cn', 'www.食狮.公司.cn')
 		end)
 	end)
+
+	context("Encode <=> Decode", function()
+		test("encode/decode pairs", function()
+			local data = {
+				[prepare[[u+2603 u+002D u+2318 u+002E u+0063 u+006F u+006D]]] = 'xn----dqo34k.com',
+				['\1\2foo.bar'] = '\1\2foo.bar',
+			}
+			for decoded, encoded in pairs(data) do
+				assert_equal(ie(decoded), encoded)
+				assert_equal(id(encoded), decoded)
+			end
+		end)
+	end)
 end)
